@@ -46,3 +46,21 @@ def create_new_invoice(client_id: str, seller_name: str, seller_tax_no: str, pos
         payment_to=payment_to,
         kind=kind
     )
+
+def create_position(position_id: str, name: str = "", total_price_gross: float = 0.0, quantity: int = 1, tax: int = 0) -> dict:
+    """Create position."""
+    position = { "id": position_id }
+
+    if name:
+        position["name"] = name
+
+    if total_price_gross:
+        position["total_price_gross"] = str(total_price_gross)
+
+    if quantity:
+        position["quantity"] = str(quantity)
+
+    if tax:
+        position["tax"] = str(tax)
+
+    return position

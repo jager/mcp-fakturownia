@@ -2,10 +2,11 @@ import os
 from dotenv import load_dotenv
 from mcp.server.fastmcp import FastMCP
 
-from helpers import format_detailed_invoice, format_invoice, format_period_parameter, format_client, get_request, post_request, format_seller
+from helpers import format_detailed_invoice, format_invoice, format_period_parameter, format_client, get_request, post_request, format_seller, put_request
 from helpers.filters import filter_clients_by_name
 from helpers.serialize import to_dict
 from models import similar_invoice, create_new_invoice, position, invoice
+from models.invoices.invoice import create_position
 
 load_dotenv()
 
@@ -168,6 +169,39 @@ async def create_invoice(client_id: str, positions: list, seller_name: str, sell
         return "Unable to create invoice."
 
     return f"Invoice created successfully with ID: {response.get('id', 'Unknown')}."
+
+@mcp.tool()
+async def modify_position_on_invoice(invoice_id: str, position_id: str, name: str = "", total_price_gross: float = 0.0, quantity: int = 1, tax: int = 0) -> str:
+    """Modify a position on an existing invoice in the Fakturovnia API.
+
+    Args:
+        invoice_id: The ID of the invoice to modify.
+        position_id: The ID of the position to modify.
+        name: The name of the position (optional).
+        total_price_gross: The total price gross of the position (optional).
+        quantity: The quantity of the position (default: 1).
+        tax: The tax rate for the position (default: 0).
+    """
+    position = create_position(
+        position_id=position_id,
+        name=name,
+        total_price_gross=total_price_gross,
+        quantity=quantity,
+        tax=tax
+    )
+    url = f"{API_BASE}/invoices/{invoice_id}.json?api_token={API_TOKEN}"
+    data = {
+        "api_token": API_TOKEN,
+        "invoice": {
+            "positions": [position]
+        }
+    }
+    response = await put_request(url, data, user_agent=USER_AGENT)
+
+    if not response:
+        return "Unable to modify position on invoice."
+
+    return f"Position modified successfully on invoice with ID: {invoice_id}."
 
 if __name__ == "__main__":
     mcp.run(transport='stdio')
