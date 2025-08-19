@@ -21,6 +21,7 @@ class invoice:
     payment_to: str
     positions: list[position]
     kind: str = "vat"
+    exempt_tax_kind: str = ""
     
 
     def __attrs_post_init__(self):
@@ -32,6 +33,9 @@ class invoice:
 
         if not self.payment_to:
             self.payment_to = (date.today() + timedelta(days=7)).isoformat()
+
+        if "zw" in [pos.tax for pos in self.positions]:
+            self.exempt_tax_kind = "Zwolnienie ze względu na nieprzekroczenie 200 000 PLN obrotu (art. 113 ust 1 i 9 ustawy o VAT)"
 
 def create_new_invoice(client_id: str, seller_name: str, seller_tax_no: str, positions: list, sell_date: str = "", issue_date: str = "", payment_to: str = "", kind: str = "vat", number: str | None = None) -> invoice:
     """Create invoice."""
