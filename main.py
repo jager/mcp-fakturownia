@@ -136,7 +136,7 @@ async def create_invoice(client_id: str, positions: list, seller_name: str, sell
 
     Args:
         client_id: The ID of the client for whom the invoice is created.
-        positions: A list of positions to include in the invoice. Each position: name, total_price_gross, quantity (default: 1), tax (default: 0). 
+        positions: A list of positions to include in the invoice. Each position: name, total_price_gross, quantity (default: 1), tax (default: "zw"). 
         seller_name: The name of the seller.
         seller_tax_no: The tax number of the seller.
         sell_date: The date of sale (optional).
@@ -171,7 +171,7 @@ async def create_invoice(client_id: str, positions: list, seller_name: str, sell
     return f"Invoice created successfully with ID: {response.get('id', 'Unknown')}."
 
 @mcp.tool()
-async def modify_position_on_invoice(invoice_id: str, position_id: str, name: str = "", total_price_gross: float = 0.0, quantity: int = 1, tax: int = 0) -> str:
+async def modify_position_on_invoice(invoice_id: str, position_id: str, name: str = "", total_price_gross: float = 0.0, quantity: int = 1, tax: str = "zw") -> str:
     """Modify a position on an existing invoice in the Fakturovnia API.
 
     Args:
@@ -180,7 +180,7 @@ async def modify_position_on_invoice(invoice_id: str, position_id: str, name: st
         name: The name of the position (optional).
         total_price_gross: The total price gross of the position (optional).
         quantity: The quantity of the position (default: 1).
-        tax: The tax rate for the position (default: 0).
+        tax: The tax rate for the position (default: "zw").
     """
     position = create_position(
         position_id=position_id,
@@ -226,7 +226,7 @@ async def delete_position_on_invoice(invoice_id: str, position_id: str) -> str:
     return f"Position with ID: {position_id} deleted successfully from invoice with ID: {invoice_id}."
 
 @mcp.tool()
-async def add_position_to_invoice(invoice_id: str, name: str = "", total_price_gross: float = 0.0, quantity: int = 1, tax: int = 0) -> str:
+async def add_position_to_invoice(invoice_id: str, name: str = "", total_price_gross: float = 0.0, quantity: int = 1, tax: str = "zw") -> str:
     """Add a new position to an existing invoice in the Fakturovnia API.
 
     Args:

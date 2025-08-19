@@ -7,7 +7,7 @@ class position:
     name: str
     total_price_gross: float
     quantity: int = 1
-    tax: int = 0
+    tax: str = "zw"
 
 
 @dataclass
@@ -47,7 +47,7 @@ def create_new_invoice(client_id: str, seller_name: str, seller_tax_no: str, pos
         kind=kind
     )
 
-def create_position(position_id: str, name: str = "", total_price_gross: float = 0.0, quantity: int = 1, tax: int = 0) -> dict:
+def create_position(position_id: str, name: str = "", total_price_gross: float = 0.0, quantity: int = 1, tax: str = "zw") -> dict:
     """Create position."""
     position = { "id": position_id }
 
@@ -61,6 +61,6 @@ def create_position(position_id: str, name: str = "", total_price_gross: float =
         position["quantity"] = str(quantity)
 
     if tax:
-        position["tax"] = str(tax)
+        position["tax"] = tax
 
     return position
