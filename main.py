@@ -203,6 +203,60 @@ async def modify_position_on_invoice(invoice_id: str, position_id: str, name: st
 
     return f"Position modified successfully on invoice with ID: {invoice_id}."
 
+@mcp.tool()
+async def delete_position_on_invoice(invoice_id: str, position_id: str) -> str:
+    """Delete a position from an existing invoice in the Fakturovnia API.
+
+    Args:
+        invoice_id: The ID of the invoice from which to delete the position.
+        position_id: The ID of the position to delete.
+    """
+    url = f"{API_BASE}/invoices/{invoice_id}.json"
+    data = {
+        "api_token": API_TOKEN,
+        "invoice": {
+            "positions": [{"id": position_id, "_destroy": 1}]
+        }
+    }
+    response = await put_request(url, data=data, user_agent=USER_AGENT)
+
+    if not response:
+        return "Unable to delete position on invoice."
+
+    return f"Position with ID: {position_id} deleted successfully from invoice with ID: {invoice_id}."
+
+@mcp.tool()
+async def add_position_to_invoice(invoice_id: str, name: str = "", total_price_gross: float = 0.0, quantity: int = 1, tax: int = 0) -> str:
+    """Add a new position to an existing invoice in the Fakturovnia API.
+
+    Args:
+        invoice_id: The ID of the invoice to which the position will be added.
+        name: The name of the position (optional).
+        total_price_gross: The total price gross of the position (optional).
+        quantity: The quantity of the position (default: 1).
+        tax: The tax rate for the position (default: 0).
+    """
+    position = create_position(
+        position_id="",
+        name=name,
+        total_price_gross=total_price_gross,
+        quantity=quantity,
+        tax=tax
+    )
+    url = f"{API_BASE}/invoices/{invoice_id}.json"
+    data = {
+        "api_token": API_TOKEN,
+        "invoice": {
+            "positions": [position]
+        }
+    }
+    response = await put_request(url, data=data, user_agent=USER_AGENT)
+
+    if not response:
+        return "Unable to add position to invoice."
+
+    return f"Position added successfully to invoice with ID: {invoice_id}."
+
 if __name__ == "__main__":
     mcp.run(transport='stdio')
 
