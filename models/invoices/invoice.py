@@ -68,3 +68,8 @@ def create_position(position_id: str, name: str = "", total_price_gross: float =
         position["tax"] = tax
 
     return position
+
+def is_status_valid(status: str) -> bool:
+    """Check if invoice status is valid."""
+    invoice_allowed_statuses = ["issued", "sent", "paid", "partial", "rejected"]
+    return status in invoice_allowed_statuses

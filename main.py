@@ -6,7 +6,7 @@ from helpers import format_detailed_invoice, format_invoice, format_period_param
 from helpers.filters import filter_clients_by_name
 from helpers.serialize import to_dict
 from models import similar_invoice, create_new_invoice, position, invoice
-from models.invoices.invoice import create_position
+from models.invoices.invoice import create_position, is_status_valid
 
 load_dotenv()
 
@@ -256,6 +256,26 @@ async def add_position_to_invoice(invoice_id: str, name: str = "", total_price_g
         return "Unable to add position to invoice."
 
     return f"Position added successfully to invoice with ID: {invoice_id}."
+
+@mcp.tool()
+async def change_invoice_status(invoice_id: str, status: str) -> str:
+    """Change the status of an existing invoice in the Fakturovnia API.
+
+    Args:
+        invoice_id: The ID of the invoice to change the status.
+        status: The new status for the invoice (e.g. "issued", "sent", "paid", "partial", "rejected")
+    """
+
+    if not is_status_valid(status):
+        return "Invalid status."
+
+    url = f"{API_BASE}/invoices/{invoice_id}/change_status.json?api_token={API_TOKEN}&status={status}"
+    response = await post_request(url, data={}, user_agent=USER_AGENT)
+
+    if not response:
+        return "Unable to change invoice status."
+
+    return f"Invoice with ID: {invoice_id} status changed to: {status}."
 
 if __name__ == "__main__":
     mcp.run(transport='stdio')
